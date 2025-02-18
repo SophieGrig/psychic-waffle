@@ -98,33 +98,44 @@
         let currentDay = localStorage.getItem("currentDay") ? parseInt(localStorage.getItem("currentDay")) : userWeeksOld;
 
         function saveProgress() {
-            let checkedIndexes = [];
-            document.querySelectorAll(".box").forEach((box, index) => {
-                if (box.classList.contains("checked")) checkedIndexes.push(index);
-            });
-            localStorage.setItem("currentDay", checkedIndexes.length);
-            return checkedIndexes;
-        }
+    let checkedIndexes = [];
+    document.querySelectorAll(".box").forEach((box, index) => {
+        if (box.classList.contains("checked")) checkedIndexes.push(index);
+    });
+
+    localStorage.setItem("currentDay", checkedIndexes.length);
+
+    // Save today's date as last check-in
+    const todayDate = new Date().toISOString().split("T")[0]; 
+    localStorage.setItem("lastCheckIn", todayDate);
+    
+    return checkedIndexes;
+}
 
         function createGrid() {
-            for (let i = 0; i < totalWeeks; i++) {
-                let box = document.createElement("div");
-                box.classList.add("box");
-                if (i < currentDay) box.classList.add("checked");
-                box.addEventListener("click", () => {
-                    box.classList.toggle("checked");
-                    saveProgress();
-                    updateCounter();
-                });
-                grid.appendChild(box);
-            }
-            updateCounter();
-        }
-
+    for (let i = 0; i < totalWeeks; i++) {
+        let box = document.createElement("div");
+        box.classList.add("box");
+        if (i < currentDay) box.classList.add("checked");
+        box.addEventListener("click", () => {
+            box.classList.toggle("checked");
+            saveProgress();
+            updateCounter(); // Ensure the counter updates when clicking a box
+        });
+        grid.appendChild(box);
+    }
+    updateCounter(); // Call it on page load
+}
         function updateCounter() {
-            let todayChecked = document.querySelectorAll(".checked").length >= userWeeksOld + 1;
-            counter.innerText = todayChecked ? "✅ You checked in today!" : "❌ You haven't checked in today.";
-        }
+    const lastCheckIn = localStorage.getItem("lastCheckIn");
+    const todayDate = new Date().toISOString().split("T")[0];
+
+    if (lastCheckIn === todayDate) {
+        counter.innerText = "✅ You checked in today!";
+    } else {
+        counter.innerText = "❌ You haven't checked in today.";
+    }
+}
 
         nextDayBtn.addEventListener("click", () => {
             if (currentDay < totalWeeks) {
