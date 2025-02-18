@@ -169,11 +169,10 @@
             counter.classList.toggle("hidden", hide);
         });
 
-        createGrid();
+        createGrid(); 
 
-    
-    const repoURL = "https://raw.githubusercontent.com/SophieGrig/psychic-waffle/main/progress.json"; 
-
+const repoURL = "https://raw.githubusercontent.com/SophieGrig/psychic-waffle/main/progress.json";
+        
     async function loadFromGitHub() {
         try {
             let response = await fetch(repoURL, { cache: "no-cache" });
