@@ -98,44 +98,61 @@
         let currentDay = localStorage.getItem("currentDay") ? parseInt(localStorage.getItem("currentDay")) : userWeeksOld;
 
         function saveProgress() {
-    let checkedIndexes = [];
-    document.querySelectorAll(".box").forEach((box, index) => {
-        if (box.classList.contains("checked")) checkedIndexes.push(index);
-    });
+            let checkedIndexes = [];
+            document.querySelectorAll(".box").forEach((box, index) => {
+                if (box.classList.contains("checked")) checkedIndexes.push(index);
+            });
 
-    localStorage.setItem("currentDay", checkedIndexes.length);
+            localStorage.setItem("currentDay", checkedIndexes.length);
 
-    // Save today's date as last check-in
-    const todayDate = new Date().toISOString().split("T")[0]; 
-    localStorage.setItem("lastCheckIn", todayDate);
-    
-    return checkedIndexes;
-}
+            // Save today's date as last check-in
+            const todayDate = new Date().toISOString().split("T")[0]; 
+            localStorage.setItem("lastCheckIn", todayDate);
+            
+            return checkedIndexes;
+        }
+
+        function updateCounter() {
+            const lastCheckIn = localStorage.getItem("lastCheckIn");
+            const todayDate = new Date().toISOString().split("T")[0];
+
+            if (lastCheckIn === todayDate) {
+                counter.innerText = "✅ You checked in today!";
+            } else {
+                counter.innerText = "❌ You haven't checked in today.";
+                // Reset today's check-in if it's a new day
+                localStorage.removeItem("lastCheckIn");
+            }
+        }
 
         function createGrid() {
-    for (let i = 0; i < totalWeeks; i++) {
-        let box = document.createElement("div");
-        box.classList.add("box");
-        if (i < currentDay) box.classList.add("checked");
-        box.addEventListener("click", () => {
-            box.classList.toggle("checked");
-            saveProgress();
-            updateCounter(); // Ensure the counter updates when clicking a box
-        });
-        grid.appendChild(box);
-    }
-    updateCounter(); // Call it on page load
-}
-        function updateCounter() {
-    const lastCheckIn = localStorage.getItem("lastCheckIn");
-    const todayDate = new Date().toISOString().split("T")[0];
+            const lastCheckIn = localStorage.getItem("lastCheckIn");
+            const todayDate = new Date().toISOString().split("T")[0];
 
-    if (lastCheckIn === todayDate) {
-        counter.innerText = "✅ You checked in today!";
-    } else {
-        counter.innerText = "❌ You haven't checked in today.";
-    }
-}
+            // If it's a new day, reset the check-in status
+            if (lastCheckIn !== todayDate) {
+                localStorage.removeItem("lastCheckIn");
+                updateCounter();
+            }
+
+            for (let i = 0; i < totalWeeks; i++) {
+                let box = document.createElement("div");
+                box.classList.add("box");
+                if (i < currentDay) box.classList.add("checked");
+                box.addEventListener("click", () => {
+                    box.classList.toggle("checked");
+                    saveProgress();
+                    updateCounter();
+                    
+                    if (localStorage.getItem("lastCheckIn") === new Date().toISOString().split("T")[0]) {
+                        alert("You've checked in for today!");
+                    }
+                });
+                grid.appendChild(box);
+            }
+
+            updateCounter(); // Ensure it starts correctly
+        }
 
         nextDayBtn.addEventListener("click", () => {
             if (currentDay < totalWeeks) {
@@ -180,7 +197,7 @@
             counter.classList.toggle("hidden", hide);
         });
 
-        createGrid(); 
+        createGrid();
     </script>
 </body>
 </html>
