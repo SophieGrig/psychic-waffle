@@ -181,28 +181,6 @@
         });
 
         createGrid(); 
-
-const repoURL = "https://raw.githubusercontent.com/SophieGrig/psychic-waffle/main/progress.json";
-        
-    async function loadFromGitHub() {
-        try {
-            let response = await fetch(repoURL, { cache: "no-cache" });
-            if (!response.ok) throw new Error("No progress file found.");
-            let progressData = await response.json();
-            
-            document.querySelectorAll(".box").forEach(box => box.classList.remove("checked"));
-            progressData.checkedDays.forEach(index => document.querySelectorAll(".box")[index].classList.add("checked"));
-            
-            currentDay = progressData.checkedDays.length;
-            saveProgress();
-            updateCounter();
-            console.log("Progress loaded from GitHub!");
-        } catch (error) {
-            console.warn("Failed to load progress from GitHub:", error.message);
-        }
-    }
-
-    loadBtn.addEventListener("click", loadFromGitHub);
     </script>
 </body>
 </html>
