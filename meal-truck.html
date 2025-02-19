@@ -34,35 +34,35 @@
 }
             
 
-        .menu-btn {
+    .menu-btn {
     font-size: 24px;
     cursor: pointer;
     background: none;
     border: none;
     color: white;
     padding: 10px;
-    position: fixed;
-    top: 15px;
-    right: 40px; /* Move it further inward */
+    position: absolute; /* Change from fixed to absolute */
+    top: 5px; /* Move it higher */
+    right: 20px; /* Align with header */
     z-index: 1000;
 }
-        
 
-       .menu {
-    display: block; /* Ensure it's visible */
-    position: fixed; /* Stay in place */
-    top: 50px; /* Below header */
-    right: 20px; /* Move inward */
+.menu {
+    display: block;
+    position: absolute; /* Keeps it aligned with the header */
+    top: 40px; /* Move it closer */
+    right: 20px;
     background: black;
     color: white;
     border: 1px solid #ddd;
     padding: 10px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
     min-width: 140px;
-    visibility: hidden; /* Hidden by default */
+    visibility: hidden;
     opacity: 0;
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
+      
 
 .menu.active {
     visibility: visible;
