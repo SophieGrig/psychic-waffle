@@ -27,24 +27,30 @@
         }
 
         .menu-btn {
-            font-size: 24px;
-            cursor: pointer;
-            background: none;
-            border: none;
-            color: white;
-            padding: 5px 10px; /* Added padding */
-        }
+    font-size: 24px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: white;
+    padding: 10px;
+    position: fixed;
+    top: 15px;
+    right: 40px; /* Move it further inward */
+    z-index: 1000;
+}
+        
 
         .menu {
     display: none;
     position: absolute;
-    top: 50px;
-    right: 10px; /* Moved slightly inward */
+    top: 0;
+    right: 0; /* Aligns the menu to the button */
+    transform: translateX(-100%); /* Moves it left, so it opens inward */
     background: white;
     border: 1px solid #ddd;
     padding: 10px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-    min-width: 120px; /* Ensure menu isn't too small */
+    min-width: 140px;
 }
 
         .menu button {
