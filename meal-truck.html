@@ -33,24 +33,23 @@
     padding: 10px;
 }
             
-
-    .menu-btn {
+.menu-btn {
     font-size: 24px;
     cursor: pointer;
     background: none;
     border: none;
     color: white;
     padding: 10px;
-    position: absolute; /* Change from fixed to absolute */
-    top: 5px; /* Move it higher */
-    right: 20px; /* Align with header */
+    position: absolute; /* Absolute instead of fixed */
+    top: 10px; /* Set the distance from the top of the header */
+    right: 20px; /* Align it to the right */
     z-index: 1000;
 }
 
 .menu {
     display: block;
-    position: absolute; /* Keeps it aligned with the header */
-    top: 40px; /* Move it closer */
+    position: absolute;
+    top: 50px; /* This controls the distance from the header */
     right: 20px;
     background: black;
     color: white;
@@ -62,6 +61,7 @@
     opacity: 0;
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
+ 
       
 
 .menu.active {
