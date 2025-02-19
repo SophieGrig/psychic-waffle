@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Meal Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f8f8f8;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: black;
+            color: white;
+            font-size: 20px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .menu-btn {
+            font-size: 24px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: white;
+        }
+
+        .menu {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 10px;
+            background: white;
+            border: 1px solid #ddd;
+            padding: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .menu button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background: black;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .menu button:hover {
+            background: #333;
+        }
+
+        .tracker-container {
+            margin-top: 60px;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 10px;
+        }
+
+        table {
+            border-collapse: collapse;
+            min-width: 900px;
+            margin: auto;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        th {
+            background: #ddd;
+        }
+
+        .current-day {
+            background: lightgreen;
+        }
+
+        .meal-input {
+            width: 100%;
+            border: none;
+            padding: 5px;
+            text-align: center;
+            font-size: 14px;
+            background: transparent;
+        }
+
+        .meal-input:focus {
+            background: #e8e8e8;
+            outline: none;
+        }
+
+        .add-meal-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: black;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <span>Meal Tracker</span>
+        <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    </div>
+
+    <div class="menu" id="menu">
+        <button onclick="saveMeals()">Save</button>
+        <button onclick="loadFile.click()">Load</button>
+        <input type="file" id="loadFile" accept=".json">
+    </div>
+
+    <div class="tracker-container">
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Monday</th>
+                    <th>Tuesday</th>
+                    <th>Wednesday</th>
+                    <th>Thursday</th>
+                    <th>Friday</th>
+                    <th>Saturday</th>
+                    <th>Sunday</th>
+                </tr>
+            </thead>
+            <tbody id="mealTable">
+                <tr><td>Morning</td></tr>
+                <tr><td>Noon</td></tr>
+                <tr><td>Snack 1</td></tr>
+                <tr><td>Snack 2</td></tr>
+                <tr><td>Snack 3</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <button class="add-meal-btn">Add Meal</button>
+
+    <script>
+        const mealTable = document.getElementById("mealTable");
+        const todayIndex = (new Date().getDay() + 6) % 7; // Adjust Sunday (0) to be last
+        const loadFile = document.getElementById("loadFile");
+
+        function createMealGrid() {
+            for (let row of mealTable.rows) {
+                for (let i = 1; i <= 7; i++) {
+                    let cell = document.createElement("td");
+                    let input = document.createElement("input");
+                    input.type = "text";
+                    input.className = "meal-input";
+                    cell.appendChild(input);
+                    if (i - 1 === todayIndex) cell.classList.add("current-day");
+                    row.appendChild(cell);
+                }
+            }
+        }
+
+        function toggleMenu() {
+            document.getElementById("menu").classList.toggle("hidden");
+        }
+
+        function saveMeals() {
+            let mealData = [];
+            for (let row of mealTable.rows) {
+                let rowData = [];
+                for (let i = 1; i <= 7; i++) {
+                    rowData.push(row.cells[i].querySelector(".meal-input").value);
+                }
+                mealData.push(rowData);
+            }
+            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(mealData));
+            let downloadAnchor = document.createElement("a");
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "meal-track.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            document.body.removeChild(downloadAnchor);
+        }
+
+        loadFile.addEventListener("change", function(event) {
+            let file = event.target.files[0];
+            if (!file) return;
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                let mealData = JSON.parse(e.target.result);
+                for (let rowIndex = 0; rowIndex < mealTable.rows.length; rowIndex++) {
+                    for (let colIndex = 1; colIndex <= 7; colIndex++) {
+                        mealTable.rows[rowIndex].cells[colIndex].querySelector(".meal-input").value = mealData[rowIndex][colIndex - 1];
+                    }
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        createMealGrid();
+    </script>
+</body>
+</html>
