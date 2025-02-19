@@ -32,18 +32,20 @@
             background: none;
             border: none;
             color: white;
+            padding: 5px 10px; /* Added padding *
         }
 
         .menu {
-            display: none;
-            position: absolute;
-            top: 50px;
-            right: 10px;
-            background: white;
-            border: 1px solid #ddd;
-            padding: 10px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-        }
+    display: none;
+    position: absolute;
+    top: 50px;
+    right: 10px; /* Moved slightly inward */
+    background: white;
+    border: 1px solid #ddd;
+    padding: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    min-width: 120px; /* Ensure menu isn't too small */
+}
 
         .menu button {
             display: block;
