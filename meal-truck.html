@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -10,237 +9,232 @@
             margin: 0;
             padding: 0;
             background: #f8f8f8;
-        }
+        }.header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        background: black;
+        color: white;
+        font-size: 20px;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 1000;
+    }
 
-        .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    background: black;
-    color: white;
-    font-size: 20px;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1000;
-}
+    .menu-btn {
+font-size: 24px;
+cursor: pointer;
+background: none;
+border: none;
+color: white;
+padding: 10px;
+position: fixed;
+top: 15px;
+right: 40px; /* Move it further inward */
+z-index: 1000;
 
-.tracker-container {
-    margin-top: 40px; /* Reduced the gap */
-    overflow-x: auto;
-    white-space: nowrap;
-    padding: 10px;
-}
-            
-.menu-btn {
-    font-size: 24px;
-    cursor: pointer;
-    background: none;
-    border: none;
-    color: white;
-    padding: 10px;
-    position: absolute; /* Absolute instead of fixed */
-    top: 10px; /* Set the distance from the top of the header */
-    right: 20px; /* Align it to the right */
-    z-index: 1000;
 }
 
 .menu {
-    display: block;
-    position: absolute;
-    top: 5px; /* This controls the distance from the header */
-    right: 60px;
-    background: black;
-    color: white;
-    border: 1px solid #ddd;
-    padding: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-    min-width: 140px;
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-}
- 
-      
+display: block; /* Ensure it's visible */
+position: fixed; /* Stay in place */
+top: 50px; /* Below header */
+right: 20px; /* Move inward */
+background: black;
+color: white;
+border: 1px solid #ddd;
+padding: 10px;
+box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+min-width: 140px;
+visibility: hidden; /* Hidden by default */
+opacity: 0;
+transition: opacity 0.3s ease, visibility 0.3s ease;
 
-.menu.active {
-    visibility: visible;
-    opacity: 1;
 }
 
-        .menu button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-            background: black;
-            color: white;
-            border: none;
-            cursor: pointer;
-            text-align: left;
-        }
+.menu.active { visibility: visible; opacity: 1; }
 
-        .menu button:hover {
-            background: #333;
-        }
+.menu button {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        background: black;
+        color: white;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+    }
 
-        table {
-            border-collapse: collapse;
-            min-width: 900px;
-            margin: auto;
-        }
+    .menu button:hover {
+        background: #333;
+    }
 
-        th, td {
-            border: 1px solid black;
-            padding: 10px;
-            text-align: center;
-            min-width: 120px;
-        }
+    .tracker-container {
+        margin-top: 60px;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding: 10px;
+    }
 
-        th {
-            background: #ddd;
-        }
+    table {
+        border-collapse: collapse;
+        min-width: 900px;
+        margin: auto;
+    }
 
-        .current-day {
-            background: lightgreen;
-        }
+    th, td {
+        border: 1px solid black;
+        padding: 10px;
+        text-align: center;
+        min-width: 120px;
+    }
 
-        .meal-input {
-            width: 100%;
-            border: none;
-            padding: 5px;
-            text-align: center;
-            font-size: 14px;
-            background: transparent;
-        }
+    th {
+        background: #ddd;
+    }
 
-        .meal-input:focus {
-            background: #e8e8e8;
-            outline: none;
-        }
+    .current-day {
+        background: lightgreen;
+    }
 
-        .add-meal-btn {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: black;
-            color: white;
-            border: none;
-            padding: 15px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 10px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-        }
+    .meal-input {
+        width: 100%;
+        border: none;
+        padding: 5px;
+        text-align: center;
+        font-size: 14px;
+        background: transparent;
+    }
 
-        .hidden {
-            display: none;
-        }
+    .meal-input:focus {
+        background: #e8e8e8;
+        outline: none;
+    }
 
-        input[type="file"] {
-            display: none;
-        }
-    </style>
+    .add-meal-btn {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: black;
+        color: white;
+        border: none;
+        padding: 15px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 10px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    input[type="file"] {
+        display: none;
+    }
+</style>
+
 </head>
-<body>
+<body><div class="header">
+    <span>Meal Tracker</span>
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+</div>
 
-    <div class="header">
-        <span>Meal Tracker</span>
-        <button class="menu-btn" onclick="toggleMenu()">☰</button>
-    </div>
+<div class="menu" id="menu">
+    <button onclick="saveMeals()">Save</button>
+    <button onclick="loadFile.click()">Load</button>
+    <input type="file" id="loadFile" accept=".json">
+</div>
 
-    <div class="menu" id="menu">
-        <button onclick="saveMeals()">Save</button>
-        <button onclick="loadFile.click()">Load</button>
-        <input type="file" id="loadFile" accept=".json">
-    </div>
+<div class="tracker-container">
+    <table>
+        <thead>
+            <tr>
+                <th></th>
+                <th>Monday</th>
+                <th>Tuesday</th>
+                <th>Wednesday</th>
+                <th>Thursday</th>
+                <th>Friday</th>
+                <th>Saturday</th>
+                <th>Sunday</th>
+            </tr>
+        </thead>
+        <tbody id="mealTable">
+            <tr><td>Morning</td></tr>
+            <tr><td>Noon</td></tr>
+            <tr><td>Snack 1</td></tr>
+            <tr><td>Snack 2</td></tr>
+            <tr><td>Snack 3</td></tr>
+        </tbody>
+    </table>
+</div>
 
-    <div class="tracker-container">
-        <table>
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>Monday</th>
-                    <th>Tuesday</th>
-                    <th>Wednesday</th>
-                    <th>Thursday</th>
-                    <th>Friday</th>
-                    <th>Saturday</th>
-                    <th>Sunday</th>
-                </tr>
-            </thead>
-            <tbody id="mealTable">
-                <tr><td>Morning</td></tr>
-                <tr><td>Noon</td></tr>
-                <tr><td>Snack 1</td></tr>
-                <tr><td>Snack 2</td></tr>
-                <tr><td>Snack 3</td></tr>
-            </tbody>
-        </table>
-    </div>
+<button class="add-meal-btn">Add Meal</button>
 
-    <button class="add-meal-btn">Add Meal</button>
+<script>
+    const mealTable = document.getElementById("mealTable");
+    const todayIndex = (new Date().getDay() + 6) % 7; // Adjust Sunday (0) to be last
+    const loadFile = document.getElementById("loadFile");
 
-    <script>
-        const mealTable = document.getElementById("mealTable");
-        const todayIndex = (new Date().getDay() + 6) % 7; // Adjust Sunday (0) to be last
-        const loadFile = document.getElementById("loadFile");
-
-        function createMealGrid() {
-            for (let row of mealTable.rows) {
-                for (let i = 1; i <= 7; i++) {
-                    let cell = document.createElement("td");
-                    let input = document.createElement("input");
-                    input.type = "text";
-                    input.className = "meal-input";
-                    cell.appendChild(input);
-                    if (i - 1 === todayIndex) cell.classList.add("current-day");
-                    row.appendChild(cell);
-                }
+    function createMealGrid() {
+        for (let row of mealTable.rows) {
+            for (let i = 1; i <= 7; i++) {
+                let cell = document.createElement("td");
+                let input = document.createElement("input");
+                input.type = "text";
+                input.className = "meal-input";
+                cell.appendChild(input);
+                if (i - 1 === todayIndex) cell.classList.add("current-day");
+                row.appendChild(cell);
             }
         }
+    }
 
-        function toggleMenu() {
-    document.getElementById("menu").classList.toggle("active");
+    function toggleMenu() {
+document.getElementById("menu").classList.toggle("active");
+
 }
-        
 
-        function saveMeals() {
-            let mealData = [];
-            for (let row of mealTable.rows) {
-                let rowData = [];
-                for (let i = 1; i <= 7; i++) {
-                    rowData.push(row.cells[i].querySelector(".meal-input").value);
-                }
-                mealData.push(rowData);
+function saveMeals() {
+        let mealData = [];
+        for (let row of mealTable.rows) {
+            let rowData = [];
+            for (let i = 1; i <= 7; i++) {
+                rowData.push(row.cells[i].querySelector(".meal-input").value);
             }
-            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(mealData));
-            let downloadAnchor = document.createElement("a");
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "meal-track.json");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            document.body.removeChild(downloadAnchor);
+            mealData.push(rowData);
         }
+        let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(mealData));
+        let downloadAnchor = document.createElement("a");
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", "meal-track.json");
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        document.body.removeChild(downloadAnchor);
+    }
 
-        loadFile.addEventListener("change", function(event) {
-            let file = event.target.files[0];
-            if (!file) return;
-            let reader = new FileReader();
-            reader.onload = function(e) {
-                let mealData = JSON.parse(e.target.result);
-                for (let rowIndex = 0; rowIndex < mealTable.rows.length; rowIndex++) {
-                    for (let colIndex = 1; colIndex <= 7; colIndex++) {
-                        mealTable.rows[rowIndex].cells[colIndex].querySelector(".meal-input").value = mealData[rowIndex][colIndex - 1];
-                    }
+    loadFile.addEventListener("change", function(event) {
+        let file = event.target.files[0];
+        if (!file) return;
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            let mealData = JSON.parse(e.target.result);
+            for (let rowIndex = 0; rowIndex < mealTable.rows.length; rowIndex++) {
+                for (let colIndex = 1; colIndex <= 7; colIndex++) {
+                    mealTable.rows[rowIndex].cells[colIndex].querySelector(".meal-input").value = mealData[rowIndex][colIndex - 1];
                 }
-            };
-            reader.readAsText(file);
-        });
+            }
+        };
+        reader.readAsText(file);
+    });
 
-        createMealGrid();
-    </script>
+    createMealGrid();
+</script>
+
 </body>
 </html>
