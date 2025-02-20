@@ -1,0 +1,185 @@
+<!DOCTYPE html>  <html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">  
+    <title>Life Calendar</title>  
+    <style>  
+        body {   
+            text-align: center;   
+            font-family: Arial, sans-serif;   
+            margin: 20px;   
+            background: #f8f8f8;  
+        }  .counter {  
+        font-size: 18px;   
+        font-weight: bold;   
+        margin-bottom: 10px;  
+    }  
+
+    .grid {   
+        display: grid;   
+        grid-template-columns: repeat(52, minmax(6px, 8px));   
+        gap: 2px;   
+        justify-content: center;   
+        margin: 20px auto;   
+        padding: 10px;  
+        max-width: 95vw;  
+    }  
+
+    .box {   
+        width: 8px;   
+        height: 8px;   
+        border: 1px solid black;   
+        cursor: pointer;   
+        background: white;   
+        transition: background 0.2s;  
+    }  
+
+    .checked {   
+        background: black;   
+    }  
+
+    .today-checked {   
+        background: green;   
+    }  
+
+    .button-row {  
+        position: fixed;  
+        bottom: 20px;  
+        left: 50%;  
+        transform: translateX(-50%);  
+        display: flex;  
+        gap: 10px;  
+        z-index: 1000;  
+    }  
+
+    .button {  
+        background: black;   
+        color: white;   
+        border: none;   
+        padding: 12px 18px;   
+        font-size: 14px;  
+        cursor: pointer;   
+        border-radius: 10px;  
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);  
+    }  
+
+    .hidden { display: none; }  
+    input[type="file"] { display: none; }  
+</style>
+
+</head>  
+<body>  <div class="counter" id="counter"></div>  
+
+<div class="grid" id="grid"></div>  
+
+<div class="button-row" id="buttonRow">  
+    <button class="button" id="nextDayBtn">Next Day</button>  
+    <button class="button" id="saveBtn">Save</button>  
+    <button class="button" id="loadBtn">Load</button>  
+    <input type="file" id="loadFile" accept=".json">  
+</div>  
+
+<script>  
+    const totalWeeks = 100 * 52;  
+    const grid = document.getElementById("grid");  
+    const nextDayBtn = document.getElementById("nextDayBtn");  
+    const saveBtn = document.getElementById("saveBtn");  
+    const loadBtn = document.getElementById("loadBtn");  
+    const loadFile = document.getElementById("loadFile");  
+    const counter = document.getElementById("counter");  
+    const buttonRow = document.getElementById("buttonRow");  
+
+    const today = new Date();  
+    const greeceOffset = 2; // Greece is UTC+2  
+    today.setHours(today.getHours() + greeceOffset);  
+    const startDate = new Date(today.getFullYear(), 0, 0);  
+    const daysThisYear = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));  
+    const userDaysOld = 8896 + daysThisYear; // Your age + days passed this year  
+    const userWeeksOld = Math.floor(userDaysOld / 7);  
+
+    let currentDay = localStorage.getItem("currentDay") ? parseInt(localStorage.getItem("currentDay")) : userWeeksOld;  
+
+    function saveProgress() {  
+        let checkedIndexes = [];  
+        document.querySelectorAll(".box").forEach((box, index) => {  
+            if (box.classList.contains("checked")) checkedIndexes.push(index);  
+        });  
+        localStorage.setItem("currentDay", checkedIndexes.length);  
+        return checkedIndexes;  
+    }  
+
+    function createGrid() {  
+        for (let i = 0; i < totalWeeks; i++) {  
+            let box = document.createElement("div");  
+            box.classList.add("box");  
+            if (i < currentDay) box.classList.add("checked");  
+
+            // Check if it's today's box  
+            const todayIndex = userWeeksOld;  
+            if (i === todayIndex && box.classList.contains("checked")) {  
+                box.classList.add("today-checked");  
+            }  
+
+            box.addEventListener("click", () => {  
+                box.classList.toggle("checked");  
+                saveProgress();  
+                updateCounter();  
+            });  
+            grid.appendChild(box);  
+        }  
+        updateCounter();  
+    }  
+
+    function updateCounter() {  
+        let todayChecked = document.querySelectorAll(".checked").length >= userWeeksOld + 1;  
+        counter.innerText = todayChecked ? "✅ You checked in today!" : "❌ You haven't checked in today.";  
+    }  
+
+    nextDayBtn.addEventListener("click", () => {  
+        if (currentDay < totalWeeks) {  
+            document.querySelectorAll(".box")[currentDay].classList.add("checked");  
+            currentDay++;  
+            saveProgress();  
+            updateCounter();  
+        }  
+    });  
+
+    saveBtn.addEventListener("click", () => {  
+        const progressData = { checkedDays: saveProgress() };  
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(progressData));  
+        const downloadAnchor = document.createElement("a");  
+        downloadAnchor.setAttribute("href", dataStr);  
+        downloadAnchor.setAttribute("download", "progress.json");  
+        document.body.appendChild(downloadAnchor);  
+        downloadAnchor.click();  
+        document.body.removeChild(downloadAnchor);  
+    });  
+
+    loadBtn.addEventListener("click", () => loadFile.click());  
+
+    loadFile.addEventListener("change", function(event) {  
+        const file = event.target.files[0];  
+        if (!file) return;  
+        const reader = new FileReader();  
+        reader.onload = function(e) {  
+            const progressData = JSON.parse(e.target.result);  
+            document.querySelectorAll(".box").forEach(box => box.classList.remove("checked"));  
+            progressData.checkedDays.forEach(index => document.querySelectorAll(".box")[index].classList.add("checked"));  
+            currentDay = progressData.checkedDays.length;  
+            saveProgress();  
+            updateCounter();  
+        };  
+        reader.readAsText(file);  
+    });  
+
+    window.addEventListener("scroll", () => {  
+        const hide = window.scrollY > 50;  
+        buttonRow.classList.toggle("hidden", hide);  
+        counter.classList.toggle("hidden", hide);  
+    });  
+
+    createGrid();  
+</script>
+
+</body>  
+</html>
