@@ -85,104 +85,110 @@
 
     <script>
         const totalWeeks = 100 * 52;
-        const grid = document.getElementById("grid");
-        const nextDayBtn = document.getElementById("nextDayBtn");
-        const saveBtn = document.getElementById("saveBtn");
-        const loadBtn = document.getElementById("loadBtn");
-        const loadFile = document.getElementById("loadFile");
-        const counter = document.getElementById("counter");
-        const buttonRow = document.getElementById("buttonRow");
+const grid = document.getElementById("grid");
+const nextDayBtn = document.getElementById("nextDayBtn");
+const saveBtn = document.getElementById("saveBtn");
+const loadBtn = document.getElementById("loadBtn");
+const loadFile = document.getElementById("loadFile");
+const counter = document.getElementById("counter");
+const buttonRow = document.getElementById("buttonRow");
 
-        const today = new Date();
-        const greeceOffset = 2; // Greece is UTC+2
-        today.setHours(today.getHours() + greeceOffset);
-        const startDate = new Date(today.getFullYear(), 0, 0);
-        const daysThisYear = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
-        const userDaysOld = 8896 + daysThisYear; // Your age + days passed this year
-        const userWeeksOld = Math.floor(userDaysOld / 7);
+const today = new Date();
+const greeceOffset = 2; // Greece is UTC+2
+today.setHours(today.getHours() + greeceOffset);
+const startDate = new Date(today.getFullYear(), 0, 0);
+const daysThisYear = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+const userDaysOld = 8896 + daysThisYear; // Your age + days passed this year
+const userWeeksOld = Math.floor(userDaysOld / 7);
+const todayIndex = userWeeksOld; // Correct index for today
 
-        let currentDay = localStorage.getItem("currentDay") ? parseInt(localStorage.getItem("currentDay")) : userWeeksOld;
+// Load progress from localStorage or set default
+let checkedIndexes = JSON.parse(localStorage.getItem("checkedIndexes")) || [];
+let currentDay = checkedIndexes.length > 0 ? Math.max(...checkedIndexes) + 1 : userWeeksOld;
 
-        function saveProgress() {
-            let checkedIndexes = [];
-            document.querySelectorAll(".box").forEach((box, index) => {
-                if (box.classList.contains("checked")) checkedIndexes.push(index);
-            });
-            localStorage.setItem("currentDay", checkedIndexes.length);
-            return checkedIndexes;
+function saveProgress() {
+    checkedIndexes = [];
+    document.querySelectorAll(".box").forEach((box, index) => {
+        if (box.classList.contains("checked")) checkedIndexes.push(index);
+    });
+    localStorage.setItem("checkedIndexes", JSON.stringify(checkedIndexes));
+}
+
+function createGrid() {
+    for (let i = 0; i < totalWeeks; i++) {
+        let box = document.createElement("div");
+        box.classList.add("box");
+
+        if (checkedIndexes.includes(i)) box.classList.add("checked");
+        if (i === todayIndex && checkedIndexes.includes(i)) {
+            box.classList.add("today-checked");
         }
 
-        function createGrid() {
-            for (let i = 0; i < totalWeeks; i++) {
-                let box = document.createElement("div");
-                box.classList.add("box");
-                if (i < currentDay) box.classList.add("checked");
-
-                // Check if it's today's box
-                const todayIndex = userWeeksOld;
-                if (i === todayIndex && box.classList.contains("checked")) {
-                    box.classList.add("today-checked");
-                }
-
-                box.addEventListener("click", () => {
-                    box.classList.toggle("checked");
-                    saveProgress();
-                    updateCounter();
-                });
-                grid.appendChild(box);
-            }
+        box.addEventListener("click", () => {
+            box.classList.toggle("checked");
+            saveProgress();
             updateCounter();
-        }
-
-        function updateCounter() {
-            let todayChecked = document.querySelectorAll(".checked").length >= userWeeksOld + 1;
-            counter.innerText = todayChecked ? "✅ You checked in today!" : "❌ You haven't checked in today.";
-        }
-
-        nextDayBtn.addEventListener("click", () => {
-            if (currentDay < totalWeeks) {
-                document.querySelectorAll(".box")[currentDay].classList.add("checked");
-                currentDay++;
-                saveProgress();
-                updateCounter();
-            }
         });
 
-        saveBtn.addEventListener("click", () => {
-            const progressData = { checkedDays: saveProgress() };
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(progressData));
-            const downloadAnchor = document.createElement("a");
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "progress.json");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            document.body.removeChild(downloadAnchor);
+        grid.appendChild(box);
+    }
+    updateCounter();
+}
+
+function updateCounter() {
+    const todayChecked = checkedIndexes.includes(todayIndex);
+    counter.innerText = todayChecked ? "✅ You checked in today!" : "❌ You haven't checked in today.";
+}
+
+// Fix Next Day Button
+nextDayBtn.addEventListener("click", () => {
+    if (currentDay < totalWeeks) {
+        document.querySelectorAll(".box")[currentDay].classList.add("checked");
+        checkedIndexes.push(currentDay);
+        currentDay++;
+        saveProgress();
+        updateCounter();
+    }
+});
+
+// Fix Save & Load
+saveBtn.addEventListener("click", () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ checkedIndexes }));
+    const downloadAnchor = document.createElement("a");
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", "progress.json");
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    document.body.removeChild(downloadAnchor);
+});
+
+loadBtn.addEventListener("click", () => loadFile.click());
+
+loadFile.addEventListener("change", function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const progressData = JSON.parse(e.target.result);
+        checkedIndexes = progressData.checkedIndexes || [];
+        document.querySelectorAll(".box").forEach((box, index) => {
+            box.classList.toggle("checked", checkedIndexes.includes(index));
         });
+        currentDay = checkedIndexes.length > 0 ? Math.max(...checkedIndexes) + 1 : userWeeksOld;
+        saveProgress();
+        updateCounter();
+    };
+    reader.readAsText(file);
+});
 
-        loadBtn.addEventListener("click", () => loadFile.click());
+window.addEventListener("scroll", () => {
+    const hide = window.scrollY > 50;
+    buttonRow.classList.toggle("hidden", hide);
+    counter.classList.toggle("hidden", hide);
+});
 
-        loadFile.addEventListener("change", function(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const progressData = JSON.parse(e.target.result);
-                document.querySelectorAll(".box").forEach(box => box.classList.remove("checked"));
-                progressData.checkedDays.forEach(index => document.querySelectorAll(".box")[index].classList.add("checked"));
-                currentDay = progressData.checkedDays.length;
-                saveProgress();
-                updateCounter();
-            };
-            reader.readAsText(file);
-        });
-
-        window.addEventListener("scroll", () => {
-            const hide = window.scrollY > 50;
-            buttonRow.classList.toggle("hidden", hide);
-            counter.classList.toggle("hidden", hide);
-        });
-
-        createGrid();
+createGrid();
+            
     </script>
 </body>
 </html>
