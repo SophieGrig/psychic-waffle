@@ -19,13 +19,16 @@
         }
 
         .grid { 
-            display: grid; 
+            display: grid !important;
             grid-template-columns: repeat(52, minmax(6px, 8px)); 
             gap: 2px; 
             justify-content: center; 
             margin: 20px auto; 
             padding: 10px;
             max-width: 95vw;
+            background: red; /* Debugging */
+            visibility: visible !important;
+            opacity: 1 !important;
         }
 
         .box { 
@@ -84,44 +87,107 @@
     </div>
 
     <script>
+        // Debug: Clear local storage
+        localStorage.clear();
+        alert("Local storage cleared! Reload the page.");
 
-        const totalWeeks = 100 * 52; const grid = document.getElementById("grid"); const nextDayBtn = document.getElementById("nextDayBtn"); const saveBtn = document.getElementById("saveBtn"); const loadBtn = document.getElementById("loadBtn"); const loadFile = document.getElementById("loadFile"); const counter = document.getElementById("counter"); const buttonRow = document.getElementById("buttonRow");
+        const totalWeeks = 100 * 52;
+        const grid = document.getElementById("grid");
+        const nextDayBtn = document.getElementById("nextDayBtn");
+        const saveBtn = document.getElementById("saveBtn");
+        const loadBtn = document.getElementById("loadBtn");
+        const loadFile = document.getElementById("loadFile");
+        const counter = document.getElementById("counter");
+        const buttonRow = document.getElementById("buttonRow");
 
-const today = new Date(); const startDate = new Date(today.getFullYear(), 0, 0); const daysThisYear = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)); const userDaysOld = 8896 + daysThisYear; // Your age + days passed this year const userWeeksOld = Math.floor(userDaysOld / 7);
+        const today = new Date();
+        const startDate = new Date(today.getFullYear(), 0, 0);
+        const daysThisYear = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+        const userDaysOld = 8896 + daysThisYear; // Your age + days passed this year
+        const userWeeksOld = Math.floor(userDaysOld / 7);
 
-let checkedIndexes = JSON.parse(localStorage.getItem("checkedIndexes")) || []; let currentDay = checkedIndexes.length > 0 ? checkedIndexes.length : userWeeksOld;
+        let checkedIndexes = JSON.parse(localStorage.getItem("checkedIndexes")) || [];
+        let currentDay = checkedIndexes.length > 0 ? checkedIndexes.length : userWeeksOld;
 
-function saveProgress() { checkedIndexes = []; document.querySelectorAll(".box").forEach((box, index) => { if (box.classList.contains("checked")) checkedIndexes.push(index); }); localStorage.setItem("checkedIndexes", JSON.stringify(checkedIndexes)); updateCounter(); }
+        function saveProgress() {
+            checkedIndexes = [];
+            document.querySelectorAll(".box").forEach((box, index) => {
+                if (box.classList.contains("checked")) checkedIndexes.push(index);
+            });
+            localStorage.setItem("checkedIndexes", JSON.stringify(checkedIndexes));
+            updateCounter();
+        }
 
-function createGrid() { for (let i = 0; i < totalWeeks; i++) { let box = document.createElement("div"); box.classList.add("box"); if (checkedIndexes.includes(i)) box.classList.add("checked"); if (i === userWeeksOld) box.classList.add("today-checked");
+        function createGrid() {
+            console.log("Creating grid...");
+            alert("Creating grid...");
 
-box.addEventListener("click", () => {
-        box.classList.toggle("checked");
-        saveProgress();
-    });
-    grid.appendChild(box);
-}
-updateCounter();
+            for (let i = 0; i < totalWeeks; i++) {
+                let box = document.createElement("div");
+                box.classList.add("box");
 
-}
+                if (checkedIndexes.includes(i)) box.classList.add("checked");
+                if (i === userWeeksOld) box.classList.add("today-checked");
 
-function updateCounter() { let todayChecked = checkedIndexes.includes(userWeeksOld); counter.innerText = todayChecked ? "✅ You checked in today!" : "❌ You haven't checked in today."; }
+                console.log("Adding box:", i);
+                alert("Adding box: " + i);
 
-nextDayBtn.addEventListener("click", () => { if (currentDay < totalWeeks) { document.querySelectorAll(".box")[currentDay].classList.add("checked"); currentDay++; saveProgress(); } });
+                box.addEventListener("click", () => {
+                    box.classList.toggle("checked");
+                    saveProgress();
+                });
+                grid.appendChild(box);
+            }
+            updateCounter();
+        }
 
-saveBtn.addEventListener("click", () => { const progressData = { checkedDays: checkedIndexes }; const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(progressData)); const downloadAnchor = document.createElement("a"); downloadAnchor.setAttribute("href", dataStr); downloadAnchor.setAttribute("download", "progress.json"); document.body.appendChild(downloadAnchor); downloadAnchor.click(); document.body.removeChild(downloadAnchor); });
+        function updateCounter() {
+            let todayChecked = checkedIndexes.includes(userWeeksOld);
+            counter.innerText = todayChecked ? "✅ You checked in today!" : "❌ You haven't checked in today.";
+        }
 
-loadBtn.addEventListener("click", () => loadFile.click());
+        nextDayBtn.addEventListener("click", () => {
+            if (currentDay < totalWeeks) {
+                document.querySelectorAll(".box")[currentDay].classList.add("checked");
+                currentDay++;
+                saveProgress();
+            }
+        });
 
-loadFile.addEventListener("change", function(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { const progressData = JSON.parse(e.target.result); document.querySelectorAll(".box").forEach(box => box.classList.remove("checked")); checkedIndexes = progressData.checkedDays; checkedIndexes.forEach(index => document.querySelectorAll(".box")[index].classList.add("checked")); saveProgress(); }; reader.readAsText(file); });
+        saveBtn.addEventListener("click", () => {
+            const progressData = { checkedDays: checkedIndexes };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(progressData));
+            const downloadAnchor = document.createElement("a");
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "progress.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            document.body.removeChild(downloadAnchor);
+        });
 
-window.addEventListener("scroll", () => { const hide = window.scrollY > 50; buttonRow.classList.toggle("hidden", hide); counter.classList.toggle("hidden", hide); });
+        loadBtn.addEventListener("click", () => loadFile.click());
 
-createGrid();
+        loadFile.addEventListener("change", function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const progressData = JSON.parse(e.target.result);
+                document.querySelectorAll(".box").forEach(box => box.classList.remove("checked"));
+                checkedIndexes = progressData.checkedDays;
+                checkedIndexes.forEach(index => document.querySelectorAll(".box")[index].classList.add("checked"));
+                saveProgress();
+            };
+            reader.readAsText(file);
+        });
 
+        window.addEventListener("scroll", () => {
+            const hide = window.scrollY > 50;
+            buttonRow.classList.toggle("hidden", hide);
+            counter.classList.toggle("hidden", hide);
+        });
 
-
-            
+        createGrid();
     </script>
 </body>
 </html>
