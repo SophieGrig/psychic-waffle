@@ -19,16 +19,13 @@
         }
 
         .grid { 
-            display: grid !important;
+            display: grid; 
             grid-template-columns: repeat(52, minmax(6px, 8px)); 
             gap: 2px; 
             justify-content: center; 
             margin: 20px auto; 
             padding: 10px;
             max-width: 95vw;
-            background: red; /* Debugging */
-            visibility: visible !important;
-            opacity: 1 !important;
         }
 
         .box { 
@@ -87,10 +84,6 @@
     </div>
 
     <script>
-        // Debug: Clear local storage
-        localStorage.clear();
-        alert("Local storage cleared! Reload the page.");
-
         const totalWeeks = 100 * 52;
         const grid = document.getElementById("grid");
         const nextDayBtn = document.getElementById("nextDayBtn");
@@ -101,40 +94,40 @@
         const buttonRow = document.getElementById("buttonRow");
 
         const today = new Date();
+        const greeceOffset = 2; // Greece is UTC+2
+        today.setHours(today.getHours() + greeceOffset);
         const startDate = new Date(today.getFullYear(), 0, 0);
         const daysThisYear = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
         const userDaysOld = 8896 + daysThisYear; // Your age + days passed this year
         const userWeeksOld = Math.floor(userDaysOld / 7);
 
-        let checkedIndexes = JSON.parse(localStorage.getItem("checkedIndexes")) || [];
-        let currentDay = checkedIndexes.length > 0 ? checkedIndexes.length : userWeeksOld;
+        let currentDay = localStorage.getItem("currentDay") ? parseInt(localStorage.getItem("currentDay")) : userWeeksOld;
 
         function saveProgress() {
-            checkedIndexes = [];
+            let checkedIndexes = [];
             document.querySelectorAll(".box").forEach((box, index) => {
                 if (box.classList.contains("checked")) checkedIndexes.push(index);
             });
-            localStorage.setItem("checkedIndexes", JSON.stringify(checkedIndexes));
-            updateCounter();
+            localStorage.setItem("currentDay", checkedIndexes.length);
+            return checkedIndexes;
         }
 
         function createGrid() {
-            console.log("Creating grid...");
-            alert("Creating grid...");
-
             for (let i = 0; i < totalWeeks; i++) {
                 let box = document.createElement("div");
                 box.classList.add("box");
+                if (i < currentDay) box.classList.add("checked");
 
-                if (checkedIndexes.includes(i)) box.classList.add("checked");
-                if (i === userWeeksOld) box.classList.add("today-checked");
-
-                console.log("Adding box:", i);
-                alert("Adding box: " + i);
+                // Check if it's today's box
+                const todayIndex = userWeeksOld;
+                if (i === todayIndex && box.classList.contains("checked")) {
+                    box.classList.add("today-checked");
+                }
 
                 box.addEventListener("click", () => {
                     box.classList.toggle("checked");
                     saveProgress();
+                    updateCounter();
                 });
                 grid.appendChild(box);
             }
@@ -142,7 +135,7 @@
         }
 
         function updateCounter() {
-            let todayChecked = checkedIndexes.includes(userWeeksOld);
+            let todayChecked = document.querySelectorAll(".checked").length >= userWeeksOld + 1;
             counter.innerText = todayChecked ? "✅ You checked in today!" : "❌ You haven't checked in today.";
         }
 
@@ -151,11 +144,12 @@
                 document.querySelectorAll(".box")[currentDay].classList.add("checked");
                 currentDay++;
                 saveProgress();
+                updateCounter();
             }
         });
 
         saveBtn.addEventListener("click", () => {
-            const progressData = { checkedDays: checkedIndexes };
+            const progressData = { checkedDays: saveProgress() };
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(progressData));
             const downloadAnchor = document.createElement("a");
             downloadAnchor.setAttribute("href", dataStr);
@@ -174,9 +168,10 @@
             reader.onload = function(e) {
                 const progressData = JSON.parse(e.target.result);
                 document.querySelectorAll(".box").forEach(box => box.classList.remove("checked"));
-                checkedIndexes = progressData.checkedDays;
-                checkedIndexes.forEach(index => document.querySelectorAll(".box")[index].classList.add("checked"));
+                progressData.checkedDays.forEach(index => document.querySelectorAll(".box")[index].classList.add("checked"));
+                currentDay = progressData.checkedDays.length;
                 saveProgress();
+                updateCounter();
             };
             reader.readAsText(file);
         });
